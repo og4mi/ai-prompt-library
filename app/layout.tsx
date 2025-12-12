@@ -6,8 +6,8 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AI Prompt Library",
-  description: "Organize and manage your AI prompts",
+  title: "Curata - Never Rewrite the Perfect Prompt",
+  description: "Never rewrite the perfect prompt. Organize and manage your AI prompts with Curata.",
 };
 
 export default function RootLayout({
