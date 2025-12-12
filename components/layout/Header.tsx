@@ -48,20 +48,18 @@ export function Header({ onAddPrompt, onImport, onLoadSamples }: HeaderProps) {
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col items-start gap-2">
             <Image
               src="/logo.png"
               alt="Curata Logo"
-              width={40}
-              height={40}
-              className="rounded-lg"
+              width={160}
+              height={160}
+              className="h-auto"
+              style={{ width: '160px', height: 'auto' }}
             />
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">AI Prompt Library</h1>
-              <p className="text-sm text-muted-foreground">
-                Organize and manage your AI prompts
-              </p>
-            </div>
+            <p className="text-sm text-muted-foreground italic">
+              Never rewrite the perfect prompt.
+            </p>
           </div>
 
           <div className="flex items-center gap-2">
