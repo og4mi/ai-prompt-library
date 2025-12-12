@@ -48,7 +48,7 @@ export function Header({ onAddPrompt, onImport, onLoadSamples }: HeaderProps) {
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex flex-col items-start gap-2">
+          <div className="flex items-center gap-4">
             <Image
               src="/logo.png"
               alt="Curata Logo"
@@ -57,7 +57,7 @@ export function Header({ onAddPrompt, onImport, onLoadSamples }: HeaderProps) {
               className="h-auto"
               style={{ width: '160px', height: 'auto' }}
             />
-            <p className="text-sm text-muted-foreground italic">
+            <p className="text-sm text-muted-foreground">
               Never rewrite the perfect prompt.
             </p>
           </div>
