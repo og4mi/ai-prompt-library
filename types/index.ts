@@ -20,6 +20,8 @@ export interface Prompt {
   isFavorite: boolean;
   usageCount: number;
   lastUsed?: string;
+  collectionId?: string;
+  isTemplate?: boolean;
 }
 
 export interface Category {
@@ -37,12 +39,21 @@ export type SortOption =
   | "favorites"
   | "mostUsed";
 
+export interface Collection {
+  id: string;
+  name: string;
+  description?: string;
+  color?: string;
+  dateCreated: string;
+}
+
 export interface FilterOptions {
   categories: string[];
   tags: string[];
   aiModels: AIModelType[];
   favoritesOnly: boolean;
   searchQuery: string;
+  collectionId?: string;
 }
 
 export interface AppSettings {

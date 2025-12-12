@@ -1,18 +1,20 @@
 "use client";
 
-import { Plus, Download, Upload, Moon, Sun, Grid3x3, List } from "lucide-react";
+import { Plus, Download, Upload, Moon, Sun, Grid3x3, List, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/store/useStore";
 import { useTheme } from "next-themes";
 import { exportData, exportPromptsToCSV } from "@/lib/storage";
 import { downloadFile } from "@/lib/utils";
+import Image from "next/image";
 
 interface HeaderProps {
   onAddPrompt: () => void;
   onImport: () => void;
+  onLoadSamples?: () => void;
 }
 
-export function Header({ onAddPrompt, onImport }: HeaderProps) {
+export function Header({ onAddPrompt, onImport, onLoadSamples }: HeaderProps) {
   const { settings, setViewMode, prompts } = useStore();
   const { theme, setTheme } = useTheme();
 
@@ -46,11 +48,16 @@ export function Header({ onAddPrompt, onImport }: HeaderProps) {
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">AI Prompt Library</h1>
-            <p className="text-sm text-muted-foreground">
-              Organize and manage your AI prompts
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">AI Prompt Library</h1>
+              <p className="text-sm text-muted-foreground">
+                Organize and manage your AI prompts
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -81,6 +88,13 @@ export function Header({ onAddPrompt, onImport }: HeaderProps) {
             </Button>
 
             <div className="h-6 w-px bg-border" />
+
+            {prompts.length === 0 && onLoadSamples && (
+              <Button variant="default" size="sm" onClick={onLoadSamples}>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Load Samples
+              </Button>
+            )}
 
             <Button variant="outline" size="sm" onClick={onImport}>
               <Upload className="h-4 w-4 mr-2" />
