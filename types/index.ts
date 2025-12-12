@@ -1,0 +1,52 @@
+export type AIModelType =
+  | "ChatGPT"
+  | "Claude"
+  | "Gemini"
+  | "Midjourney"
+  | "DALL-E"
+  | "Stable Diffusion"
+  | "Other";
+
+export interface Prompt {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  tags: string[];
+  sourceUrl?: string;
+  aiModel: AIModelType;
+  dateAdded: string;
+  notes?: string;
+  isFavorite: boolean;
+  usageCount: number;
+  lastUsed?: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  color?: string;
+}
+
+export type ViewMode = "grid" | "list";
+
+export type SortOption =
+  | "dateAdded"
+  | "alphabetical"
+  | "lastUsed"
+  | "favorites"
+  | "mostUsed";
+
+export interface FilterOptions {
+  categories: string[];
+  tags: string[];
+  aiModels: AIModelType[];
+  favoritesOnly: boolean;
+  searchQuery: string;
+}
+
+export interface AppSettings {
+  viewMode: ViewMode;
+  sortBy: SortOption;
+  theme: "light" | "dark" | "system";
+}

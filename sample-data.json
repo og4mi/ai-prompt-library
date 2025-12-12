@@ -1,0 +1,154 @@
+{
+  "prompts": [
+    {
+      "id": "sample-1",
+      "title": "Code Review Assistant",
+      "content": "Review the following code and provide feedback on:\n1. Code quality and best practices\n2. Potential bugs or security issues\n3. Performance optimizations\n4. Readability improvements\n\n[Insert code here]",
+      "category": "Code",
+      "tags": ["code-review", "debugging", "best-practices"],
+      "aiModel": "Claude",
+      "dateAdded": "2025-01-15T10:00:00.000Z",
+      "notes": "Use this for comprehensive code reviews",
+      "isFavorite": true,
+      "usageCount": 12,
+      "lastUsed": "2025-01-20T14:30:00.000Z"
+    },
+    {
+      "id": "sample-2",
+      "title": "Blog Post Outline Generator",
+      "content": "Create a detailed blog post outline for the topic: [TOPIC]\n\nInclude:\n- Engaging title options\n- Introduction hook\n- 5-7 main sections with subpoints\n- Key takeaways\n- Call to action\n\nTarget audience: [AUDIENCE]\nTone: [TONE]",
+      "category": "Writing",
+      "tags": ["blogging", "content-creation", "outline"],
+      "aiModel": "ChatGPT",
+      "dateAdded": "2025-01-14T09:15:00.000Z",
+      "notes": "Great for content planning",
+      "isFavorite": true,
+      "usageCount": 8,
+      "lastUsed": "2025-01-18T11:20:00.000Z"
+    },
+    {
+      "id": "sample-3",
+      "title": "Photorealistic Portrait Generator",
+      "content": "Create a photorealistic portrait of [DESCRIPTION], professional studio lighting, 85mm lens, shallow depth of field, high detail, 8k resolution, professional photography",
+      "category": "Image Generation",
+      "tags": ["portrait", "photorealistic", "studio"],
+      "aiModel": "Midjourney",
+      "dateAdded": "2025-01-13T16:45:00.000Z",
+      "sourceUrl": "https://example.com/midjourney-tips",
+      "notes": "Works well with detailed descriptions",
+      "isFavorite": false,
+      "usageCount": 5,
+      "lastUsed": "2025-01-17T09:00:00.000Z"
+    },
+    {
+      "id": "sample-4",
+      "title": "Data Analysis Expert",
+      "content": "Analyze the following dataset and provide:\n\n1. Summary statistics\n2. Key trends and patterns\n3. Outliers and anomalies\n4. Actionable insights\n5. Visualization recommendations\n\nData: [INSERT DATA]\n\nFocus on: [SPECIFIC ASPECTS]",
+      "category": "Analysis",
+      "tags": ["data-analysis", "statistics", "insights"],
+      "aiModel": "Claude",
+      "dateAdded": "2025-01-12T13:20:00.000Z",
+      "notes": "Excellent for business intelligence",
+      "isFavorite": true,
+      "usageCount": 15,
+      "lastUsed": "2025-01-19T16:00:00.000Z"
+    },
+    {
+      "id": "sample-5",
+      "title": "Creative Story Starter",
+      "content": "Write the opening paragraph of a [GENRE] story that:\n- Immediately hooks the reader\n- Establishes the setting and mood\n- Introduces a compelling character or situation\n- Hints at the central conflict\n\nTheme: [THEME]\nSetting: [SETTING]",
+      "category": "Creative",
+      "tags": ["storytelling", "fiction", "creative-writing"],
+      "aiModel": "ChatGPT",
+      "dateAdded": "2025-01-11T08:30:00.000Z",
+      "notes": "Great for overcoming writer's block",
+      "isFavorite": false,
+      "usageCount": 3,
+      "lastUsed": "2025-01-15T12:00:00.000Z"
+    },
+    {
+      "id": "sample-6",
+      "title": "Meeting Summary Generator",
+      "content": "Create a concise meeting summary from these notes:\n\n[PASTE MEETING NOTES]\n\nInclude:\n- Key decisions made\n- Action items with owners\n- Important discussion points\n- Next steps and deadlines\n\nFormat as a professional memo.",
+      "category": "Productivity",
+      "tags": ["meetings", "summary", "action-items"],
+      "aiModel": "Claude",
+      "dateAdded": "2025-01-10T14:00:00.000Z",
+      "notes": "Saves hours of meeting follow-up time",
+      "isFavorite": true,
+      "usageCount": 20,
+      "lastUsed": "2025-01-20T10:00:00.000Z"
+    },
+    {
+      "id": "sample-7",
+      "title": "Debug Assistant",
+      "content": "Help me debug this error:\n\nError message: [ERROR]\nCode context: [CODE]\nWhat I've tried: [ATTEMPTS]\n\nPlease:\n1. Explain what's causing the error\n2. Provide a step-by-step fix\n3. Suggest how to prevent similar issues\n4. Show the corrected code",
+      "category": "Code",
+      "tags": ["debugging", "troubleshooting", "error-fixing"],
+      "aiModel": "ChatGPT",
+      "dateAdded": "2025-01-09T11:45:00.000Z",
+      "notes": "Essential for quick bug fixes",
+      "isFavorite": true,
+      "usageCount": 18,
+      "lastUsed": "2025-01-19T15:30:00.000Z"
+    },
+    {
+      "id": "sample-8",
+      "title": "Fantasy Landscape Generator",
+      "content": "A breathtaking fantasy landscape, [SPECIFIC FEATURES], magical atmosphere, epic scale, trending on artstation, highly detailed, vibrant colors, dramatic lighting, concept art style",
+      "category": "Image Generation",
+      "tags": ["landscape", "fantasy", "concept-art"],
+      "aiModel": "Stable Diffusion",
+      "dateAdded": "2025-01-08T15:30:00.000Z",
+      "sourceUrl": "https://example.com/sd-prompts",
+      "notes": "Adjust features for different moods",
+      "isFavorite": false,
+      "usageCount": 7,
+      "lastUsed": "2025-01-16T13:00:00.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "writing",
+      "name": "Writing",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "code",
+      "name": "Code",
+      "color": "#10B981"
+    },
+    {
+      "id": "image",
+      "name": "Image Generation",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "analysis",
+      "name": "Analysis",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "creative",
+      "name": "Creative",
+      "color": "#EC4899"
+    },
+    {
+      "id": "productivity",
+      "name": "Productivity",
+      "color": "#6366F1"
+    },
+    {
+      "id": "other",
+      "name": "Other",
+      "color": "#6B7280"
+    }
+  ],
+  "settings": {
+    "viewMode": "grid",
+    "sortBy": "dateAdded",
+    "theme": "system"
+  },
+  "exportedAt": "2025-01-20T12:00:00.000Z",
+  "version": "1.0"
+}
