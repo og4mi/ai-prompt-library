@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { Header } from "@/components/layout/Header";
 import { FilterSidebar } from "@/components/layout/FilterSidebar";
 import { SearchBar } from "@/components/layout/SearchBar";
+import { BulkActionToolbar } from "@/components/layout/BulkActionToolbar";
 import { PromptCard } from "@/components/prompts/PromptCard";
 import { PromptForm } from "@/components/prompts/PromptForm";
 import { PromptDetail } from "@/components/prompts/PromptDetail";
@@ -14,7 +15,7 @@ import { useStore } from "@/store/useStore";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import type { Prompt } from "@/types";
-import { Loader2, Sparkles, Plus } from "lucide-react";
+import { Loader2, Sparkles, Plus, CheckSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { importData } from "@/lib/storage";
 
@@ -28,6 +29,8 @@ export default function HomePage() {
     setSelectedPrompt,
     setCurrentUserId,
     syncWithSupabase,
+    isBulkMode,
+    toggleBulkMode,
   } = useStore();
 
   const { user } = useAuth();
@@ -145,6 +148,15 @@ export default function HomePage() {
                 <Sparkles className="h-4 w-4 mr-2" />
                 Templates
               </Button>
+              <Button
+                variant={isBulkMode ? "default" : "outline"}
+                size="sm"
+                onClick={toggleBulkMode}
+                className="flex-shrink-0"
+              >
+                <CheckSquare className="h-4 w-4 mr-2" />
+                {isBulkMode ? "Exit Bulk Mode" : "Bulk Select"}
+              </Button>
             </div>
 
             {filteredPrompts.length === 0 ? (
@@ -219,6 +231,8 @@ export default function HomePage() {
           window.location.reload();
         }}
       />
+
+      <BulkActionToolbar />
 
       {/* Keyboard shortcuts hint */}
       <div className="fixed bottom-4 right-4 text-xs text-muted-foreground bg-background/80 backdrop-blur px-3 py-2 rounded-lg border hidden md:block">

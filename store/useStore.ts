@@ -35,6 +35,8 @@ interface AppState {
   filters: FilterOptions;
   isLoading: boolean;
   selectedPrompt: Prompt | null;
+  selectedPromptIds: Set<string>;
+  isBulkMode: boolean;
 
   // Auth State
   currentUserId: string | null;
@@ -66,6 +68,13 @@ interface AppState {
   // Actions - UI
   setSelectedPrompt: (prompt: Prompt | null) => void;
   initializeStore: () => void;
+
+  // Actions - Bulk Operations
+  toggleBulkMode: () => void;
+  togglePromptSelection: (id: string) => void;
+  selectAllPrompts: () => void;
+  clearSelection: () => void;
+  bulkDeletePrompts: (ids: string[]) => Promise<void>;
 }
 
 const defaultFilters: FilterOptions = {
@@ -88,6 +97,8 @@ export const useStore = create<AppState>((set, get) => ({
   filters: defaultFilters,
   isLoading: true,
   selectedPrompt: null,
+  selectedPromptIds: new Set<string>(),
+  isBulkMode: false,
   currentUserId: null,
 
   // Auth actions
@@ -386,5 +397,48 @@ export const useStore = create<AppState>((set, get) => ({
       settings,
       isLoading: false,
     });
+  },
+
+  // Bulk operations
+  toggleBulkMode: () => {
+    const isBulkMode = !get().isBulkMode;
+    set({ isBulkMode, selectedPromptIds: new Set() });
+  },
+
+  togglePromptSelection: (id) => {
+    const selectedPromptIds = new Set(get().selectedPromptIds);
+    if (selectedPromptIds.has(id)) {
+      selectedPromptIds.delete(id);
+    } else {
+      selectedPromptIds.add(id);
+    }
+    set({ selectedPromptIds });
+  },
+
+  selectAllPrompts: () => {
+    const filteredPrompts = get().getFilteredPrompts();
+    const selectedPromptIds = new Set(filteredPrompts.map((p) => p.id));
+    set({ selectedPromptIds });
+  },
+
+  clearSelection: () => {
+    set({ selectedPromptIds: new Set() });
+  },
+
+  bulkDeletePrompts: async (ids) => {
+    const prompts = get().prompts.filter((prompt) => !ids.includes(prompt.id));
+    set({ prompts, selectedPrompt: null, selectedPromptIds: new Set() });
+    savePrompts(prompts);
+
+    // Sync to Supabase if user is logged in
+    const { currentUserId } = get();
+    if (currentUserId) {
+      try {
+        // Delete each prompt from Supabase
+        await Promise.all(ids.map((id) => deletePromptDb(id, currentUserId)));
+      } catch (error) {
+        console.error("Error bulk deleting prompts from Supabase:", error);
+      }
+    }
   },
 }));

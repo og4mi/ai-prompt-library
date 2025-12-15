@@ -5,6 +5,7 @@ import { Star, Copy, Edit, Trash2, ExternalLink, Check } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Prompt } from "@/types";
 import { useStore } from "@/store/useStore";
 import { formatDate, truncateText, copyToClipboard } from "@/lib/utils";
@@ -18,7 +19,15 @@ interface PromptCardProps {
 
 export function PromptCard({ prompt, viewMode, onEdit }: PromptCardProps) {
   const [copied, setCopied] = useState(false);
-  const { toggleFavorite, deletePrompt, incrementUsage, setSelectedPrompt } = useStore();
+  const {
+    toggleFavorite,
+    deletePrompt,
+    incrementUsage,
+    setSelectedPrompt,
+    isBulkMode,
+    selectedPromptIds,
+    togglePromptSelection
+  } = useStore();
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -48,17 +57,36 @@ export function PromptCard({ prompt, viewMode, onEdit }: PromptCardProps) {
   };
 
   const handleCardClick = () => {
-    setSelectedPrompt(prompt);
+    if (isBulkMode) {
+      togglePromptSelection(prompt.id);
+    } else {
+      setSelectedPrompt(prompt);
+    }
   };
+
+  const handleCheckboxChange = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    togglePromptSelection(prompt.id);
+  };
+
+  const isSelected = selectedPromptIds.has(prompt.id);
 
   if (viewMode === "list") {
     return (
       <Card
-        className="hover:shadow-md transition-shadow cursor-pointer animate-fade-in"
+        className={cn(
+          "hover:shadow-md transition-shadow cursor-pointer animate-fade-in",
+          isSelected && "ring-2 ring-primary"
+        )}
         onClick={handleCardClick}
       >
         <CardContent className="p-4">
           <div className="flex items-start justify-between gap-4">
+            {isBulkMode && (
+              <div className="flex items-center pt-1" onClick={handleCheckboxChange}>
+                <Checkbox checked={isSelected} />
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
                 <h3 className="font-semibold text-lg truncate">{prompt.title}</h3>
@@ -138,10 +166,18 @@ export function PromptCard({ prompt, viewMode, onEdit }: PromptCardProps) {
 
   return (
     <Card
-      className="h-full hover:shadow-md transition-shadow cursor-pointer animate-fade-in flex flex-col"
+      className={cn(
+        "h-full hover:shadow-md transition-shadow cursor-pointer animate-fade-in flex flex-col",
+        isSelected && "ring-2 ring-primary"
+      )}
       onClick={handleCardClick}
     >
       <CardContent className="p-4 flex-1 flex flex-col">
+        {isBulkMode && (
+          <div className="flex justify-end mb-2" onClick={handleCheckboxChange}>
+            <Checkbox checked={isSelected} />
+          </div>
+        )}
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-semibold text-lg line-clamp-2 flex-1">{prompt.title}</h3>
           {prompt.isFavorite && (
