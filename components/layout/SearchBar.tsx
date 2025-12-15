@@ -34,14 +34,14 @@ export function SearchBar() {
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           placeholder="Search prompts..."
-          className="pl-9 pr-9"
+          className="pl-9 pr-9 h-9"
         />
         {searchValue && (
           <button
@@ -53,10 +53,11 @@ export function SearchBar() {
         )}
       </div>
 
-      <div className="w-48">
+      <div className="w-full sm:w-48">
         <Select
           value={settings.sortBy}
           onChange={(e) => setSortBy(e.target.value as SortOption)}
+          className="h-9"
         >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>

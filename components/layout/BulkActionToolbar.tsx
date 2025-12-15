@@ -44,24 +44,26 @@ export function BulkActionToolbar() {
 
   return (
     <>
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground rounded-lg shadow-lg px-6 py-3 flex items-center gap-4 z-50 animate-fade-in">
-        <div className="flex items-center gap-2">
-          <CheckSquare className="h-5 w-5" />
-          <span className="font-medium">
-            {selectedCount} {selectedCount === 1 ? "prompt" : "prompts"} selected
+      <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground rounded-lg shadow-lg px-3 sm:px-6 py-2 sm:py-3 flex items-center gap-2 sm:gap-4 z-50 animate-fade-in max-w-[95vw]">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <CheckSquare className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+          <span className="font-medium text-xs sm:text-base">
+            {selectedCount} {selectedCount === 1 ? "prompt" : "prompts"}
           </span>
         </div>
 
-        <div className="h-6 w-px bg-primary-foreground/20" />
+        <div className="h-5 sm:h-6 w-px bg-primary-foreground/20" />
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {selectedCount < filteredCount && (
             <Button
               variant="secondary"
               size="sm"
               onClick={handleSelectAll}
+              className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
             >
-              Select All ({filteredCount})
+              <span className="hidden sm:inline">Select All ({filteredCount})</span>
+              <span className="sm:hidden">All</span>
             </Button>
           )}
 
@@ -69,18 +71,20 @@ export function BulkActionToolbar() {
             variant="destructive"
             size="sm"
             onClick={() => setShowDeleteDialog(true)}
+            className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
           >
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
+            <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Delete</span>
           </Button>
 
           <Button
             variant="secondary"
             size="sm"
             onClick={clearSelection}
+            className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
           >
-            <X className="h-4 w-4 mr-2" />
-            Cancel
+            <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Cancel</span>
           </Button>
         </div>
       </div>

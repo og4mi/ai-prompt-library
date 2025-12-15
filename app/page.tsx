@@ -128,41 +128,44 @@ export default function HomePage() {
         <FilterSidebar />
 
         <main className="flex-1 overflow-y-auto">
-          <div className="container mx-auto px-4 py-6">
-            <div className="mb-6 flex items-center gap-3">
+          <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+            <div className="mb-4 sm:mb-6 space-y-2 sm:space-y-3">
               <SearchBar />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsTemplatesOpen(true)}
-                className="flex-shrink-0"
-              >
-                <Sparkles className="h-4 w-4 mr-2" />
-                Templates
-              </Button>
-              <Button
-                variant={isBulkMode ? "default" : "outline"}
-                size="sm"
-                onClick={toggleBulkMode}
-                className="flex-shrink-0"
-              >
-                <CheckSquare className="h-4 w-4 mr-2" />
-                {isBulkMode ? "Exit Bulk Mode" : "Bulk Select"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsTemplatesOpen(true)}
+                  className="flex-1 sm:flex-none h-9"
+                >
+                  <Sparkles className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Templates</span>
+                </Button>
+                <Button
+                  variant={isBulkMode ? "default" : "outline"}
+                  size="sm"
+                  onClick={toggleBulkMode}
+                  className="flex-1 sm:flex-none h-9"
+                >
+                  <CheckSquare className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">{isBulkMode ? "Exit Bulk Mode" : "Bulk Select"}</span>
+                  <span className="sm:hidden">{isBulkMode ? "Exit" : "Bulk"}</span>
+                </Button>
+              </div>
             </div>
 
             {filteredPrompts.length === 0 ? (
-              <div className="text-center py-12">
-                <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground mb-4">
+              <div className="text-center py-8 sm:py-12 px-4">
+                <Sparkles className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-muted-foreground" />
+                <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">
                   No prompts found. Get started by adding a prompt or using a template!
                 </p>
-                <div className="flex gap-2 justify-center">
-                  <Button onClick={handleAddPrompt}>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <Button onClick={handleAddPrompt} className="w-full sm:w-auto">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Prompt
                   </Button>
-                  <Button variant="outline" onClick={() => setIsTemplatesOpen(true)}>
+                  <Button variant="outline" onClick={() => setIsTemplatesOpen(true)} className="w-full sm:w-auto">
                     <Sparkles className="h-4 w-4 mr-2" />
                     Browse Templates
                   </Button>
@@ -172,8 +175,8 @@ export default function HomePage() {
               <div
                 className={
                   settings.viewMode === "grid"
-                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                    : "space-y-3"
+                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+                    : "space-y-2 sm:space-y-3"
                 }
               >
                 {filteredPrompts.map((prompt) => (
@@ -188,7 +191,7 @@ export default function HomePage() {
             )}
 
             {filteredPrompts.length > 0 && (
-              <div className="mt-6 text-center text-sm text-muted-foreground">
+              <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm text-muted-foreground pb-20 sm:pb-6">
                 Showing {filteredPrompts.length} prompt{filteredPrompts.length !== 1 ? "s" : ""}
               </div>
             )}
@@ -226,8 +229,8 @@ export default function HomePage() {
 
       <BulkActionToolbar />
 
-      {/* Keyboard shortcuts hint */}
-      <div className="fixed bottom-4 right-4 text-xs text-muted-foreground bg-background/80 backdrop-blur px-3 py-2 rounded-lg border hidden md:block">
+      {/* Keyboard shortcuts hint - only on desktop */}
+      <div className="fixed bottom-4 right-4 text-xs text-muted-foreground bg-background/80 backdrop-blur px-3 py-2 rounded-lg border hidden lg:block">
         <div className="space-y-1">
           <div><kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+K</kbd> Search</div>
           <div><kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+N</kbd> New Prompt</div>

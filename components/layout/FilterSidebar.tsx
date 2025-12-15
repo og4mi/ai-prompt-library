@@ -57,7 +57,7 @@ export function FilterSidebar() {
     filters.favoritesOnly;
 
   return (
-    <aside className="w-64 border-r bg-muted/30 p-4 overflow-y-auto">
+    <aside className="hidden lg:block w-64 border-r bg-muted/30 p-4 overflow-y-auto">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold text-lg">Filters</h2>
         {hasActiveFilters && (
