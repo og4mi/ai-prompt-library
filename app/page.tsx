@@ -9,7 +9,9 @@ import { PromptForm } from "@/components/prompts/PromptForm";
 import { PromptDetail } from "@/components/prompts/PromptDetail";
 import { ImportDialog } from "@/components/layout/ImportDialog";
 import { TemplatesDialog } from "@/components/prompts/TemplatesDialog";
+import { AuthModal } from "@/components/auth/AuthModal";
 import { useStore } from "@/store/useStore";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import type { Prompt } from "@/types";
 import { Loader2, Sparkles, Plus } from "lucide-react";
@@ -24,17 +26,32 @@ export default function HomePage() {
     settings,
     selectedPrompt,
     setSelectedPrompt,
+    setCurrentUserId,
+    syncWithSupabase,
   } = useStore();
+
+  const { user } = useAuth();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [editingPrompt, setEditingPrompt] = useState<Prompt | undefined>();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     initializeStore();
   }, [initializeStore]);
+
+  // Sync with Supabase when user logs in
+  useEffect(() => {
+    if (user) {
+      setCurrentUserId(user.id);
+      syncWithSupabase(user.id);
+    } else {
+      setCurrentUserId(null);
+    }
+  }, [user, setCurrentUserId, syncWithSupabase]);
 
   // Keyboard shortcuts
   useKeyboardShortcuts([
@@ -109,6 +126,7 @@ export default function HomePage() {
         onAddPrompt={handleAddPrompt}
         onImport={() => setIsImportOpen(true)}
         onLoadSamples={handleLoadSamples}
+        onSignInClick={() => setIsAuthModalOpen(true)}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -191,6 +209,15 @@ export default function HomePage() {
       <TemplatesDialog
         isOpen={isTemplatesOpen}
         onClose={() => setIsTemplatesOpen(false)}
+      />
+
+      <AuthModal
+        open={isAuthModalOpen}
+        onOpenChange={setIsAuthModalOpen}
+        onSuccess={() => {
+          // Reload to trigger sync
+          window.location.reload();
+        }}
       />
 
       {/* Keyboard shortcuts hint */}

@@ -16,6 +16,13 @@ import {
   loadSettings,
   saveSettings,
 } from "@/lib/storage";
+import {
+  fetchPrompts,
+  createPrompt,
+  updatePrompt as updatePromptDb,
+  deletePrompt as deletePromptDb,
+  syncLocalPromptsToDb,
+} from "@/lib/supabase/database";
 import { generateId } from "@/lib/utils";
 
 interface AppState {
@@ -28,6 +35,11 @@ interface AppState {
   filters: FilterOptions;
   isLoading: boolean;
   selectedPrompt: Prompt | null;
+
+  // Auth State
+  currentUserId: string | null;
+  setCurrentUserId: (userId: string | null) => void;
+  syncWithSupabase: (userId: string) => Promise<void>;
 
   // Actions - Prompts
   addPrompt: (prompt: Omit<Prompt, "id" | "dateAdded" | "usageCount" | "lastUsed">) => void;
@@ -76,9 +88,58 @@ export const useStore = create<AppState>((set, get) => ({
   filters: defaultFilters,
   isLoading: true,
   selectedPrompt: null,
+  currentUserId: null,
+
+  // Auth actions
+  setCurrentUserId: (userId) => {
+    set({ currentUserId: userId });
+  },
+
+  syncWithSupabase: async (userId: string) => {
+    try {
+      console.log("Starting Supabase sync for user:", userId);
+
+      // Load local prompts
+      const localPrompts = loadPrompts();
+      console.log("Loaded local prompts:", localPrompts.length);
+
+      // If user has local prompts, regenerate IDs with proper UUIDs and sync them to Supabase
+      if (localPrompts.length > 0) {
+        console.log("Migrating local prompts with new UUIDs...");
+        // Regenerate IDs for all local prompts to ensure they're proper UUIDs
+        const migratedPrompts = localPrompts.map(prompt => ({
+          ...prompt,
+          id: generateId(), // Generate new UUID for each prompt
+        }));
+
+        console.log("Syncing migrated prompts to Supabase...");
+        await syncLocalPromptsToDb(migratedPrompts, userId);
+        console.log("Local prompts synced successfully");
+      }
+
+      // Fetch prompts from Supabase
+      console.log("Fetching prompts from Supabase...");
+      const supabasePrompts = await fetchPrompts(userId);
+      console.log("Fetched prompts from Supabase:", supabasePrompts.length);
+
+      // Update store with Supabase data
+      set({ prompts: supabasePrompts });
+
+      // Also update localStorage to keep in sync
+      savePrompts(supabasePrompts);
+      console.log("Sync completed successfully");
+    } catch (error: any) {
+      console.error("Error syncing with Supabase:", error);
+      console.error("Error message:", error?.message);
+      console.error("Error details:", JSON.stringify(error, null, 2));
+      // Fall back to local data if sync fails
+      const localPrompts = loadPrompts();
+      set({ prompts: localPrompts });
+    }
+  },
 
   // Prompt actions
-  addPrompt: (promptData) => {
+  addPrompt: async (promptData) => {
     const newPrompt: Prompt = {
       ...promptData,
       id: generateId(),
@@ -90,31 +151,77 @@ export const useStore = create<AppState>((set, get) => ({
     const prompts = [...get().prompts, newPrompt];
     set({ prompts });
     savePrompts(prompts);
+
+    // Sync to Supabase if user is logged in
+    const { currentUserId } = get();
+    if (currentUserId) {
+      try {
+        await createPrompt(newPrompt, currentUserId);
+      } catch (error) {
+        console.error("Error syncing prompt to Supabase:", error);
+      }
+    }
   },
 
-  updatePrompt: (id, updates) => {
+  updatePrompt: async (id, updates) => {
     const prompts = get().prompts.map((prompt) =>
       prompt.id === id ? { ...prompt, ...updates } : prompt
     );
     set({ prompts });
     savePrompts(prompts);
+
+    // Sync to Supabase if user is logged in
+    const { currentUserId } = get();
+    if (currentUserId) {
+      const updatedPrompt = prompts.find((p) => p.id === id);
+      if (updatedPrompt) {
+        try {
+          await updatePromptDb(updatedPrompt, currentUserId);
+        } catch (error) {
+          console.error("Error updating prompt in Supabase:", error);
+        }
+      }
+    }
   },
 
-  deletePrompt: (id) => {
+  deletePrompt: async (id) => {
     const prompts = get().prompts.filter((prompt) => prompt.id !== id);
     set({ prompts, selectedPrompt: null });
     savePrompts(prompts);
+
+    // Sync to Supabase if user is logged in
+    const { currentUserId } = get();
+    if (currentUserId) {
+      try {
+        await deletePromptDb(id, currentUserId);
+      } catch (error) {
+        console.error("Error deleting prompt from Supabase:", error);
+      }
+    }
   },
 
-  toggleFavorite: (id) => {
+  toggleFavorite: async (id) => {
     const prompts = get().prompts.map((prompt) =>
       prompt.id === id ? { ...prompt, isFavorite: !prompt.isFavorite } : prompt
     );
     set({ prompts });
     savePrompts(prompts);
+
+    // Sync to Supabase if user is logged in
+    const { currentUserId } = get();
+    if (currentUserId) {
+      const updatedPrompt = prompts.find((p) => p.id === id);
+      if (updatedPrompt) {
+        try {
+          await updatePromptDb(updatedPrompt, currentUserId);
+        } catch (error) {
+          console.error("Error updating favorite in Supabase:", error);
+        }
+      }
+    }
   },
 
-  incrementUsage: (id) => {
+  incrementUsage: async (id) => {
     const prompts = get().prompts.map((prompt) =>
       prompt.id === id
         ? {
@@ -126,6 +233,19 @@ export const useStore = create<AppState>((set, get) => ({
     );
     set({ prompts });
     savePrompts(prompts);
+
+    // Sync to Supabase if user is logged in
+    const { currentUserId } = get();
+    if (currentUserId) {
+      const updatedPrompt = prompts.find((p) => p.id === id);
+      if (updatedPrompt) {
+        try {
+          await updatePromptDb(updatedPrompt, currentUserId);
+        } catch (error) {
+          console.error("Error updating usage in Supabase:", error);
+        }
+      }
+    }
   },
 
   // Category actions

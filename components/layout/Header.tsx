@@ -9,20 +9,18 @@ import { exportData, exportPromptsToCSV } from "@/lib/storage";
 import { downloadFile } from "@/lib/utils";
 import { signOut } from "@/lib/supabase/auth";
 import Image from "next/image";
-import { useState } from "react";
-import { AuthModal } from "@/components/auth/AuthModal";
 
 interface HeaderProps {
   onAddPrompt: () => void;
   onImport: () => void;
   onLoadSamples?: () => void;
+  onSignInClick: () => void;
 }
 
-export function Header({ onAddPrompt, onImport, onLoadSamples }: HeaderProps) {
+export function Header({ onAddPrompt, onImport, onLoadSamples, onSignInClick }: HeaderProps) {
   const { settings, setViewMode, prompts } = useStore();
   const { theme, setTheme } = useTheme();
   const { user } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleExportJSON = () => {
     const data = exportData();
@@ -127,7 +125,7 @@ export function Header({ onAddPrompt, onImport, onLoadSamples }: HeaderProps) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowAuthModal(true)}
+                onClick={onSignInClick}
                 title="Sign in to sync across devices"
               >
                 <LogIn className="h-4 w-4 mr-2" />
@@ -166,15 +164,6 @@ export function Header({ onAddPrompt, onImport, onLoadSamples }: HeaderProps) {
           </div>
         </div>
       </div>
-
-      <AuthModal
-        open={showAuthModal}
-        onOpenChange={setShowAuthModal}
-        onSuccess={() => {
-          // Reload to trigger sync
-          window.location.reload();
-        }}
-      />
     </header>
   );
 }

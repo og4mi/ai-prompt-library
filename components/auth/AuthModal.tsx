@@ -49,8 +49,8 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="mb-4">
           <DialogTitle>
             {mode === "signin" ? "Sign In" : "Create Account"}
           </DialogTitle>
@@ -61,7 +61,7 @@ export function AuthModal({ open, onOpenChange, onSuccess }: AuthModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
