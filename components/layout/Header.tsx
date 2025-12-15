@@ -13,11 +13,10 @@ import Image from "next/image";
 interface HeaderProps {
   onAddPrompt: () => void;
   onImport: () => void;
-  onLoadSamples?: () => void;
   onSignInClick: () => void;
 }
 
-export function Header({ onAddPrompt, onImport, onLoadSamples, onSignInClick }: HeaderProps) {
+export function Header({ onAddPrompt, onImport, onSignInClick }: HeaderProps) {
   const { settings, setViewMode, prompts } = useStore();
   const { theme, setTheme } = useTheme();
   const { user } = useAuth();
@@ -134,13 +133,6 @@ export function Header({ onAddPrompt, onImport, onLoadSamples, onSignInClick }: 
             )}
 
             <div className="h-6 w-px bg-border" />
-
-            {prompts.length === 0 && onLoadSamples && (
-              <Button variant="default" size="sm" onClick={onLoadSamples}>
-                <Sparkles className="h-4 w-4 mr-2" />
-                Load Samples
-              </Button>
-            )}
 
             <Button variant="outline" size="sm" onClick={onImport}>
               <Upload className="h-4 w-4 mr-2" />

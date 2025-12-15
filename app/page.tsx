@@ -108,13 +108,6 @@ export default function HomePage() {
     setSelectedPrompt(null);
   };
 
-  const handleLoadSamples = async () => {
-    const response = await fetch("/sample-data.json");
-    const data = await response.json();
-    importData(JSON.stringify(data));
-    initializeStore();
-  };
-
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -128,7 +121,6 @@ export default function HomePage() {
       <Header
         onAddPrompt={handleAddPrompt}
         onImport={() => setIsImportOpen(true)}
-        onLoadSamples={handleLoadSamples}
         onSignInClick={() => setIsAuthModalOpen(true)}
       />
 
