@@ -110,25 +110,35 @@ export const useStore = create<AppState>((set, get) => ({
     try {
       console.log("Starting Supabase sync for user:", userId);
 
-      // Load local prompts
-      const localPrompts = loadPrompts();
-      console.log("Loaded local prompts:", localPrompts.length);
+      // Check if we've already done the initial migration for this user
+      const hasMigrated = localStorage.getItem(`migrated_${userId}`);
 
-      // If user has local prompts, regenerate IDs with proper UUIDs and sync them to Supabase
-      if (localPrompts.length > 0) {
-        console.log("Migrating local prompts with new UUIDs...");
-        // Regenerate IDs for all local prompts to ensure they're proper UUIDs
-        const migratedPrompts = localPrompts.map(prompt => ({
-          ...prompt,
-          id: generateId(), // Generate new UUID for each prompt
-        }));
+      if (!hasMigrated) {
+        // Load local prompts for first-time migration only
+        const localPrompts = loadPrompts();
+        console.log("Loaded local prompts for migration:", localPrompts.length);
 
-        console.log("Syncing migrated prompts to Supabase...");
-        await syncLocalPromptsToDb(migratedPrompts, userId);
-        console.log("Local prompts synced successfully");
+        // If user has local prompts, regenerate IDs with proper UUIDs and sync them to Supabase
+        if (localPrompts.length > 0) {
+          console.log("Migrating local prompts with new UUIDs (one-time migration)...");
+          // Regenerate IDs for all local prompts to ensure they're proper UUIDs
+          const migratedPrompts = localPrompts.map(prompt => ({
+            ...prompt,
+            id: generateId(), // Generate new UUID for each prompt
+          }));
+
+          console.log("Syncing migrated prompts to Supabase...");
+          await syncLocalPromptsToDb(migratedPrompts, userId);
+          console.log("Local prompts synced successfully");
+        }
+
+        // Mark migration as complete
+        localStorage.setItem(`migrated_${userId}`, 'true');
+      } else {
+        console.log("Migration already completed for this user, skipping local upload");
       }
 
-      // Fetch prompts from Supabase
+      // Fetch prompts from Supabase (this is the source of truth)
       console.log("Fetching prompts from Supabase...");
       const supabasePrompts = await fetchPrompts(userId);
       console.log("Fetched prompts from Supabase:", supabasePrompts.length);
