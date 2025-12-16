@@ -59,6 +59,7 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [customAIModel, setCustomAIModel] = useState("");
+  const [customModelError, setCustomModelError] = useState("");
 
   // Get all unique custom AI models from existing prompts
   const existingCustomModels = Array.from(
@@ -68,6 +69,32 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
         .filter((model) => !AI_MODELS.includes(model as AIModelType))
     )
   ).map((model) => model.toLowerCase());
+
+  const validateCustomModel = (value: string): string => {
+    if (!value.trim()) {
+      return "";
+    }
+
+    const customModelLower = value.trim().toLowerCase();
+
+    // Check if it matches a predefined model (case-insensitive)
+    const matchesPredefined = AI_MODELS.some(
+      (model) => model.toLowerCase() === customModelLower
+    );
+
+    if (matchesPredefined) {
+      return `"${value.trim()}" already exists in the dropdown. Please select it from the list.`;
+    }
+
+    // Check if it matches an existing custom model (case-insensitive)
+    const isEditingSameModel = prompt && prompt.aiModel.toLowerCase() === customModelLower;
+
+    if (!isEditingSameModel && existingCustomModels.includes(customModelLower)) {
+      return `"${value.trim()}" has already been used. Please use a different name.`;
+    }
+
+    return "";
+  };
 
   const resetForm = () => {
     setFormData({
@@ -82,6 +109,7 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
     setTags([]);
     setTagInput("");
     setCustomAIModel("");
+    setCustomModelError("");
   };
 
   useEffect(() => {
@@ -106,6 +134,19 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prompt, isOpen]);
 
+  const handleCustomModelChange = (value: string) => {
+    setCustomAIModel(value);
+    // Clear error when user starts typing
+    if (customModelError) {
+      setCustomModelError("");
+    }
+  };
+
+  const handleCustomModelBlur = () => {
+    const error = validateCustomModel(customAIModel);
+    setCustomModelError(error);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -116,28 +157,13 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
 
     if (formData.aiModel === "Other") {
       if (!customAIModel.trim()) {
-        alert("Please enter a custom AI model name");
+        setCustomModelError("Please enter a custom AI model name");
         return;
       }
 
-      const customModelLower = customAIModel.trim().toLowerCase();
-
-      // Check if it matches a predefined model (case-insensitive)
-      const matchesPredefined = AI_MODELS.some(
-        (model) => model.toLowerCase() === customModelLower
-      );
-
-      if (matchesPredefined) {
-        alert(`"${customAIModel.trim()}" already exists in the AI Model dropdown. Please select it from the list instead.`);
-        return;
-      }
-
-      // Check if it matches an existing custom model (case-insensitive)
-      // But allow it if we're editing the same prompt with the same custom model
-      const isEditingSameModel = prompt && prompt.aiModel.toLowerCase() === customModelLower;
-
-      if (!isEditingSameModel && existingCustomModels.includes(customModelLower)) {
-        alert(`"${customAIModel.trim()}" has already been used as a custom AI model. Please use a different name or select "Other" to reuse it.`);
+      const error = validateCustomModel(customAIModel);
+      if (error) {
+        setCustomModelError(error);
         return;
       }
     }
@@ -252,6 +278,7 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
                   });
                   if (e.target.value !== "Other") {
                     setCustomAIModel("");
+                    setCustomModelError("");
                   }
                 }}
                 required
@@ -272,11 +299,18 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
               </label>
               <Input
                 value={customAIModel}
-                onChange={(e) => setCustomAIModel(e.target.value)}
+                onChange={(e) => handleCustomModelChange(e.target.value)}
+                onBlur={handleCustomModelBlur}
                 placeholder="Enter AI model name (e.g., GPT-5, Claude Opus)"
+                className={customModelError ? "border-destructive" : ""}
                 required
               />
-              {existingCustomModels.length > 0 && (
+              {customModelError && (
+                <p className="text-xs text-destructive mt-1.5">
+                  {customModelError}
+                </p>
+              )}
+              {!customModelError && existingCustomModels.length > 0 && (
                 <p className="text-xs text-muted-foreground mt-1.5">
                   Previously used custom models: {prompts
                     .map((p) => p.aiModel)
