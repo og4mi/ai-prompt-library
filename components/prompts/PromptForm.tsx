@@ -44,7 +44,7 @@ const AI_MODELS: AIModelType[] = [
 ];
 
 export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
-  const { categories, addPrompt, updatePrompt } = useStore();
+  const { categories, addPrompt, updatePrompt, prompts } = useStore();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -59,6 +59,15 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [customAIModel, setCustomAIModel] = useState("");
+
+  // Get all unique custom AI models from existing prompts
+  const existingCustomModels = Array.from(
+    new Set(
+      prompts
+        .map((p) => p.aiModel)
+        .filter((model) => !AI_MODELS.includes(model as AIModelType))
+    )
+  ).map((model) => model.toLowerCase());
 
   const resetForm = () => {
     setFormData({
@@ -105,9 +114,32 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
       return;
     }
 
-    if (formData.aiModel === "Other" && !customAIModel.trim()) {
-      alert("Please enter a custom AI model name");
-      return;
+    if (formData.aiModel === "Other") {
+      if (!customAIModel.trim()) {
+        alert("Please enter a custom AI model name");
+        return;
+      }
+
+      const customModelLower = customAIModel.trim().toLowerCase();
+
+      // Check if it matches a predefined model (case-insensitive)
+      const matchesPredefined = AI_MODELS.some(
+        (model) => model.toLowerCase() === customModelLower
+      );
+
+      if (matchesPredefined) {
+        alert(`"${customAIModel.trim()}" already exists in the AI Model dropdown. Please select it from the list instead.`);
+        return;
+      }
+
+      // Check if it matches an existing custom model (case-insensitive)
+      // But allow it if we're editing the same prompt with the same custom model
+      const isEditingSameModel = prompt && prompt.aiModel.toLowerCase() === customModelLower;
+
+      if (!isEditingSameModel && existingCustomModels.includes(customModelLower)) {
+        alert(`"${customAIModel.trim()}" has already been used as a custom AI model. Please use a different name or select "Other" to reuse it.`);
+        return;
+      }
     }
 
     const promptData = {
@@ -244,6 +276,15 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
                 placeholder="Enter AI model name (e.g., GPT-5, Claude Opus)"
                 required
               />
+              {existingCustomModels.length > 0 && (
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  Previously used custom models: {prompts
+                    .map((p) => p.aiModel)
+                    .filter((model) => !AI_MODELS.includes(model as AIModelType))
+                    .filter((value, index, self) => self.indexOf(value) === index)
+                    .join(", ")}
+                </p>
+              )}
             </div>
           )}
 
