@@ -10,6 +10,7 @@ import type { Prompt } from "@/types";
 import { useStore } from "@/store/useStore";
 import { formatDate, truncateText, copyToClipboard } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface PromptCardProps {
   prompt: Prompt;
@@ -35,7 +36,15 @@ export function PromptCard({ prompt, viewMode, onEdit }: PromptCardProps) {
     if (success) {
       setCopied(true);
       incrementUsage(prompt.id);
+      toast.success("Copied to clipboard!", {
+        description: prompt.title,
+        duration: 2000,
+      });
       setTimeout(() => setCopied(false), 2000);
+    } else {
+      toast.error("Failed to copy", {
+        description: "Please try again",
+      });
     }
   };
 

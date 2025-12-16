@@ -26,6 +26,7 @@ import type { Prompt } from "@/types";
 import { useStore } from "@/store/useStore";
 import { formatDate, copyToClipboard } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface PromptDetailProps {
   prompt: Prompt | null;
@@ -44,7 +45,15 @@ export function PromptDetail({ prompt, onClose, onEdit }: PromptDetailProps) {
     if (success) {
       setCopied(true);
       incrementUsage(prompt.id);
+      toast.success("Copied to clipboard!", {
+        description: prompt.title,
+        duration: 2000,
+      });
       setTimeout(() => setCopied(false), 2000);
+    } else {
+      toast.error("Failed to copy", {
+        description: "Please try again",
+      });
     }
   };
 
@@ -74,6 +83,9 @@ export function PromptDetail({ prompt, onClose, onEdit }: PromptDetailProps) {
       sourceUrl: prompt.sourceUrl,
       notes: prompt.notes,
       isFavorite: false,
+    });
+    toast.success("Prompt duplicated!", {
+      description: `${prompt.title} (Copy)`,
     });
     onClose();
   };
