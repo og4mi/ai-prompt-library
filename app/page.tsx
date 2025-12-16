@@ -69,18 +69,18 @@ export default function HomePage() {
       description: "Focus search",
     },
     {
-      key: "n",
+      key: "p",
       ctrlKey: true,
       metaKey: true,
       action: () => handleAddPrompt(),
       description: "New prompt",
     },
     {
-      key: "t",
+      key: "b",
       ctrlKey: true,
       metaKey: true,
       action: () => setIsTemplatesOpen(true),
-      description: "Open templates",
+      description: "Browse templates",
     },
     {
       key: "Escape",
@@ -240,8 +240,8 @@ export default function HomePage() {
       <div className="fixed bottom-4 right-4 text-xs text-muted-foreground bg-background/80 backdrop-blur px-3 py-2 rounded-lg border hidden lg:block">
         <div className="space-y-1">
           <div><kbd className="px-1.5 py-0.5 rounded bg-muted">⌘K</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+K</kbd> Search</div>
-          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">⌘N</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+N</kbd> New Prompt</div>
-          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">⌘T</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+T</kbd> Templates</div>
+          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">⌘P</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+P</kbd> New Prompt</div>
+          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">⌘B</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+B</kbd> Templates</div>
           <div><kbd className="px-1.5 py-0.5 rounded bg-muted">Esc</kbd> Close</div>
         </div>
       </div>
