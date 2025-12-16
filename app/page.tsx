@@ -60,30 +60,37 @@ export default function HomePage() {
   useKeyboardShortcuts([
     {
       key: "k",
-      ctrl: true,
-      callback: () => {
-        const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+      ctrlKey: true,
+      metaKey: true,
+      action: () => {
+        const searchInput = document.querySelector('input[placeholder="Search prompts..."]') as HTMLInputElement;
         searchInput?.focus();
       },
+      description: "Focus search",
     },
     {
       key: "n",
-      ctrl: true,
-      callback: () => handleAddPrompt(),
+      ctrlKey: true,
+      metaKey: true,
+      action: () => handleAddPrompt(),
+      description: "New prompt",
     },
     {
       key: "t",
-      ctrl: true,
-      callback: () => setIsTemplatesOpen(true),
+      ctrlKey: true,
+      metaKey: true,
+      action: () => setIsTemplatesOpen(true),
+      description: "Open templates",
     },
     {
       key: "Escape",
-      callback: () => {
+      action: () => {
         if (isFormOpen) setIsFormOpen(false);
-        if (isImportOpen) setIsImportOpen(false);
-        if (isTemplatesOpen) setIsTemplatesOpen(false);
-        if (selectedPrompt) setSelectedPrompt(null);
+        else if (isImportOpen) setIsImportOpen(false);
+        else if (isTemplatesOpen) setIsTemplatesOpen(false);
+        else if (selectedPrompt) setSelectedPrompt(null);
       },
+      description: "Close modal",
     },
   ]);
 
@@ -232,9 +239,9 @@ export default function HomePage() {
       {/* Keyboard shortcuts hint - only on desktop */}
       <div className="fixed bottom-4 right-4 text-xs text-muted-foreground bg-background/80 backdrop-blur px-3 py-2 rounded-lg border hidden lg:block">
         <div className="space-y-1">
-          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+K</kbd> Search</div>
-          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+N</kbd> New Prompt</div>
-          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+T</kbd> Templates</div>
+          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">⌘K</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+K</kbd> Search</div>
+          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">⌘N</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+N</kbd> New Prompt</div>
+          <div><kbd className="px-1.5 py-0.5 rounded bg-muted">⌘T</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-muted">Ctrl+T</kbd> Templates</div>
           <div><kbd className="px-1.5 py-0.5 rounded bg-muted">Esc</kbd> Close</div>
         </div>
       </div>
