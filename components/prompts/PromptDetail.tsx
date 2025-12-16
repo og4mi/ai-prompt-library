@@ -12,6 +12,7 @@ import {
   Calendar,
   Tag,
   Cpu,
+  Files,
 } from "lucide-react";
 import {
   Dialog,
@@ -34,7 +35,7 @@ interface PromptDetailProps {
 
 export function PromptDetail({ prompt, onClose, onEdit }: PromptDetailProps) {
   const [copied, setCopied] = useState(false);
-  const { toggleFavorite, deletePrompt, incrementUsage } = useStore();
+  const { toggleFavorite, deletePrompt, incrementUsage, addPrompt } = useStore();
 
   if (!prompt) return null;
 
@@ -61,6 +62,20 @@ export function PromptDetail({ prompt, onClose, onEdit }: PromptDetailProps) {
       deletePrompt(prompt.id);
       onClose();
     }
+  };
+
+  const handleDuplicate = () => {
+    addPrompt({
+      title: `${prompt.title} (Copy)`,
+      content: prompt.content,
+      category: prompt.category,
+      aiModel: prompt.aiModel,
+      tags: [...prompt.tags],
+      sourceUrl: prompt.sourceUrl,
+      notes: prompt.notes,
+      isFavorite: false,
+    });
+    onClose();
   };
 
   return (
@@ -102,7 +117,12 @@ export function PromptDetail({ prompt, onClose, onEdit }: PromptDetailProps) {
         <div className="space-y-6 mt-6">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <h4 className="font-semibold">Prompt Content</h4>
+              <div className="flex items-center gap-4">
+                <h4 className="font-semibold">Prompt Content</h4>
+                <span className="text-xs text-muted-foreground">
+                  {prompt.content.trim().split(/\s+/).filter(Boolean).length} words • {prompt.content.length} characters
+                </span>
+              </div>
               <Button
                 variant={copied ? "default" : "outline"}
                 size="sm"
@@ -185,6 +205,10 @@ export function PromptDetail({ prompt, onClose, onEdit }: PromptDetailProps) {
             <Button onClick={handleEdit} variant="default">
               <Edit className="h-4 w-4 mr-2" />
               Edit
+            </Button>
+            <Button onClick={handleDuplicate} variant="outline">
+              <Files className="h-4 w-4 mr-2" />
+              Duplicate
             </Button>
             <Button onClick={handleDelete} variant="destructive">
               <Trash2 className="h-4 w-4 mr-2" />

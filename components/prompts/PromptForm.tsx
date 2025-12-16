@@ -29,6 +29,17 @@ const AI_MODELS: AIModelType[] = [
   "Midjourney",
   "DALL-E",
   "Stable Diffusion",
+  "MagicPatterns",
+  "Vercel",
+  "Lovable",
+  "Cursor",
+  "Replit",
+  "Aura",
+  "Anything",
+  "Builder",
+  "Ideogram",
+  "Krea",
+  "FLORA",
   "Other",
 ];
 
@@ -145,9 +156,14 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-1.5 block">
-              Prompt Content <span className="text-destructive">*</span>
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-sm font-medium">
+                Prompt Content <span className="text-destructive">*</span>
+              </label>
+              <span className="text-xs text-muted-foreground">
+                {formData.content.trim().split(/\s+/).filter(Boolean).length} words • {formData.content.length} characters
+              </span>
+            </div>
             <Textarea
               value={formData.content}
               onChange={(e) =>

@@ -5,6 +5,17 @@ export type AIModelType =
   | "Midjourney"
   | "DALL-E"
   | "Stable Diffusion"
+  | "MagicPatterns"
+  | "Vercel"
+  | "Lovable"
+  | "Cursor"
+  | "Replit"
+  | "Aura"
+  | "Anything"
+  | "Builder"
+  | "Ideogram"
+  | "Krea"
+  | "FLORA"
   | "Other";
 
 export interface Prompt {
