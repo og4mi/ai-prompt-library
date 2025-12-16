@@ -25,7 +25,7 @@ export interface Prompt {
   category: string;
   tags: string[];
   sourceUrl?: string;
-  aiModel: AIModelType;
+  aiModel: AIModelType | string;
   dateAdded: string;
   notes?: string;
   isFavorite: boolean;

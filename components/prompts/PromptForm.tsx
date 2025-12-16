@@ -58,6 +58,7 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
 
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [customAIModel, setCustomAIModel] = useState("");
 
   const resetForm = () => {
     setFormData({
@@ -71,20 +72,25 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
     });
     setTags([]);
     setTagInput("");
+    setCustomAIModel("");
   };
 
   useEffect(() => {
     if (prompt) {
+      // Check if the AI model is a custom one (not in predefined list)
+      const isCustomModel = !AI_MODELS.includes(prompt.aiModel as AIModelType);
+
       setFormData({
         title: prompt.title,
         content: prompt.content,
         category: prompt.category,
-        aiModel: prompt.aiModel,
+        aiModel: isCustomModel ? "Other" : (prompt.aiModel as AIModelType),
         sourceUrl: prompt.sourceUrl || "",
         notes: prompt.notes || "",
         isFavorite: prompt.isFavorite,
       });
       setTags(prompt.tags);
+      setCustomAIModel(isCustomModel ? prompt.aiModel : "");
     } else {
       resetForm();
     }
@@ -99,8 +105,14 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
       return;
     }
 
+    if (formData.aiModel === "Other" && !customAIModel.trim()) {
+      alert("Please enter a custom AI model name");
+      return;
+    }
+
     const promptData = {
       ...formData,
+      aiModel: formData.aiModel === "Other" ? customAIModel.trim() : formData.aiModel,
       tags,
     };
 
@@ -201,12 +213,15 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
               </label>
               <Select
                 value={formData.aiModel}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormData({
                     ...formData,
                     aiModel: e.target.value as AIModelType,
-                  })
-                }
+                  });
+                  if (e.target.value !== "Other") {
+                    setCustomAIModel("");
+                  }
+                }}
                 required
               >
                 {AI_MODELS.map((model) => (
@@ -217,6 +232,20 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
               </Select>
             </div>
           </div>
+
+          {formData.aiModel === "Other" && (
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">
+                Custom AI Model Name <span className="text-destructive">*</span>
+              </label>
+              <Input
+                value={customAIModel}
+                onChange={(e) => setCustomAIModel(e.target.value)}
+                placeholder="Enter AI model name (e.g., GPT-5, Claude Opus)"
+                required
+              />
+            </div>
+          )}
 
           <div>
             <label className="text-sm font-medium mb-1.5 block">Tags</label>
