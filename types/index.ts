@@ -61,7 +61,7 @@ export interface Collection {
 export interface FilterOptions {
   categories: string[];
   tags: string[];
-  aiModels: AIModelType[];
+  aiModels: (AIModelType | string)[];
   favoritesOnly: boolean;
   searchQuery: string;
   collectionId?: string;
