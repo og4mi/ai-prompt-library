@@ -101,7 +101,7 @@ export function PromptCard({ prompt, viewMode, onEdit }: PromptCardProps) {
                 <Badge variant="outline" className="text-xs">{prompt.category}</Badge>
                 <Badge variant="secondary" className="text-xs">{prompt.aiModel}</Badge>
                 {prompt.tags.slice(0, 2).map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs">
+                  <Badge key={tag} variant="default" className="text-xs">
                     {tag}
                   </Badge>
                 ))}
