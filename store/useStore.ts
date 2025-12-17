@@ -46,7 +46,8 @@ interface AppState {
   // Actions - Prompts
   addPrompt: (prompt: Omit<Prompt, "id" | "dateAdded" | "usageCount" | "lastUsed">) => void;
   updatePrompt: (id: string, updates: Partial<Prompt>) => void;
-  deletePrompt: (id: string) => void;
+  deletePrompt: (id: string) => Promise<Prompt | undefined>;
+  restorePrompt: (prompt: Prompt) => Promise<void>;
   toggleFavorite: (id: string) => void;
   incrementUsage: (id: string) => void;
 
@@ -206,6 +207,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   deletePrompt: async (id) => {
+    const deletedPrompt = get().prompts.find((prompt) => prompt.id === id);
     const prompts = get().prompts.filter((prompt) => prompt.id !== id);
     set({ prompts, selectedPrompt: null });
     savePrompts(prompts);
@@ -217,6 +219,24 @@ export const useStore = create<AppState>((set, get) => ({
         await deletePromptDb(id, currentUserId);
       } catch (error) {
         console.error("Error deleting prompt from Supabase:", error);
+      }
+    }
+
+    return deletedPrompt;
+  },
+
+  restorePrompt: async (prompt) => {
+    const prompts = [...get().prompts, prompt];
+    set({ prompts });
+    savePrompts(prompts);
+
+    // Sync to Supabase if user is logged in
+    const { currentUserId } = get();
+    if (currentUserId) {
+      try {
+        await createPrompt(prompt, currentUserId);
+      } catch (error) {
+        console.error("Error restoring prompt to Supabase:", error);
       }
     }
   },

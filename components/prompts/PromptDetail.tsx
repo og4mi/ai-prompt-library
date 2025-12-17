@@ -13,7 +13,14 @@ import {
   Tag,
   Cpu,
   Files,
+  Eye,
+  FileText,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
+import "highlight.js/styles/github-dark.css";
 import {
   Dialog,
   DialogContent,
@@ -36,7 +43,8 @@ interface PromptDetailProps {
 
 export function PromptDetail({ prompt, onClose, onEdit }: PromptDetailProps) {
   const [copied, setCopied] = useState(false);
-  const { toggleFavorite, deletePrompt, incrementUsage, addPrompt } = useStore();
+  const [showMarkdown, setShowMarkdown] = useState(true);
+  const { toggleFavorite, deletePrompt, incrementUsage, addPrompt, restorePrompt } = useStore();
 
   if (!prompt) return null;
 
@@ -66,10 +74,24 @@ export function PromptDetail({ prompt, onClose, onEdit }: PromptDetailProps) {
     onClose();
   };
 
-  const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this prompt?")) {
-      deletePrompt(prompt.id);
-      onClose();
+  const handleDelete = async () => {
+    const deletedPrompt = await deletePrompt(prompt.id);
+    onClose();
+
+    if (deletedPrompt) {
+      toast.success("Prompt deleted", {
+        description: deletedPrompt.title,
+        duration: 5000,
+        action: {
+          label: "Undo",
+          onClick: () => {
+            restorePrompt(deletedPrompt);
+            toast.success("Prompt restored!", {
+              description: deletedPrompt.title,
+            });
+          },
+        },
+      });
     }
   };
 
@@ -135,26 +157,76 @@ export function PromptDetail({ prompt, onClose, onEdit }: PromptDetailProps) {
                   {prompt.content.trim().split(/\s+/).filter(Boolean).length} words • {prompt.content.length} characters
                 </span>
               </div>
-              <Button
-                variant={copied ? "default" : "outline"}
-                size="sm"
-                onClick={handleCopy}
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-4 w-4 mr-2" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy to Clipboard
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowMarkdown(!showMarkdown)}
+                  title={showMarkdown ? "Show raw text" : "Show markdown preview"}
+                >
+                  {showMarkdown ? (
+                    <>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Raw
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="h-4 w-4 mr-2" />
+                      Preview
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant={copied ? "default" : "outline"}
+                  size="sm"
+                  onClick={handleCopy}
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy to Clipboard
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-            <div className="bg-muted/50 rounded-md p-4 whitespace-pre-wrap text-sm">
-              {prompt.content}
+            <div className={cn(
+              "rounded-md p-4 text-sm",
+              showMarkdown ? "bg-background border" : "bg-muted/50"
+            )}>
+              {showMarkdown ? (
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                    components={{
+                    a: ({ node, ...props }) => (
+                      <a {...props} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" />
+                    ),
+                    code: ({ node, inline, className, children, ...props }: any) => (
+                      inline ? (
+                        <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                          {children}
+                        </code>
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      )
+                    ),
+                    }}
+                  >
+                    {prompt.content}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <pre className="whitespace-pre-wrap font-mono">{prompt.content}</pre>
+              )}
             </div>
           </div>
 

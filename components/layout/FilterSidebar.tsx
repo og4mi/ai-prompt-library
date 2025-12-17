@@ -1,12 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Star, X, Plus, Edit2, Trash2 } from "lucide-react";
+import {
+  Star, X, Plus, Edit2, Trash2,
+  Briefcase, Code, Lightbulb, Rocket, Target, Zap,
+  Heart, Flame, Trophy, Crown, Sparkles,
+  MessageSquare, Mail, Phone, Globe, Book, FileText,
+  Database, Server, Cloud, Lock, Shield, Key,
+  ShoppingCart, DollarSign, TrendingUp, PieChart, BarChart, Activity,
+  Users, User, Smile, Coffee, Music,
+  Camera, Image, Calendar, Clock, Bell, CheckCircle,
+  Settings, Wrench, Package, Box, Layers, Grid,
+  Folder, Tag, Bookmark, Flag,
+  Home, Building, MapPin, Laptop,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/store/useStore";
-import type { AIModelType } from "@/types";
+import type { AIModelType, Category } from "@/types";
 import { cn } from "@/lib/utils";
+import { CategoryModal } from "./CategoryModal";
 
 const AI_MODELS: AIModelType[] = [
   "ChatGPT",
@@ -29,11 +42,68 @@ const AI_MODELS: AIModelType[] = [
   "Other",
 ];
 
+const ICON_MAP: Record<string, React.ElementType> = {
+  briefcase: Briefcase,
+  code: Code,
+  lightbulb: Lightbulb,
+  rocket: Rocket,
+  target: Target,
+  zap: Zap,
+  heart: Heart,
+  star: Star,
+  flame: Flame,
+  trophy: Trophy,
+  crown: Crown,
+  sparkles: Sparkles,
+  message: MessageSquare,
+  mail: Mail,
+  phone: Phone,
+  globe: Globe,
+  book: Book,
+  file: FileText,
+  database: Database,
+  server: Server,
+  cloud: Cloud,
+  lock: Lock,
+  shield: Shield,
+  key: Key,
+  cart: ShoppingCart,
+  dollar: DollarSign,
+  trending: TrendingUp,
+  pie: PieChart,
+  bar: BarChart,
+  activity: Activity,
+  users: Users,
+  user: User,
+  smile: Smile,
+  coffee: Coffee,
+  music: Music,
+  camera: Camera,
+  image: Image,
+  calendar: Calendar,
+  clock: Clock,
+  bell: Bell,
+  check: CheckCircle,
+  settings: Settings,
+  wrench: Wrench,
+  package: Package,
+  box: Box,
+  layers: Layers,
+  grid: Grid,
+  folder: Folder,
+  tag: Tag,
+  bookmark: Bookmark,
+  flag: Flag,
+  home: Home,
+  building: Building,
+  map: MapPin,
+  laptop: Laptop,
+};
+
 export function FilterSidebar() {
   const { categories, prompts, filters, setFilters, resetFilters, addCategory, updateCategory, deleteCategory } = useStore();
-  const [isAddingCategory, setIsAddingCategory] = useState(false);
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
-  const [categoryInput, setCategoryInput] = useState("");
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | undefined>(undefined);
 
   // Get all unique tags from prompts
   const allTags = Array.from(
@@ -65,21 +135,21 @@ export function FilterSidebar() {
     setFilters({ favoritesOnly: !filters.favoritesOnly });
   };
 
-  const handleAddCategory = () => {
-    if (categoryInput.trim()) {
-      const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      addCategory({ name: categoryInput.trim(), color: randomColor });
-      setCategoryInput("");
-      setIsAddingCategory(false);
-    }
+  const handleOpenAddCategory = () => {
+    setEditingCategory(undefined);
+    setIsCategoryModalOpen(true);
   };
 
-  const handleUpdateCategory = (id: string) => {
-    if (categoryInput.trim()) {
-      updateCategory(id, { name: categoryInput.trim() });
-      setCategoryInput("");
-      setEditingCategoryId(null);
+  const handleOpenEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setIsCategoryModalOpen(true);
+  };
+
+  const handleSaveCategory = (name: string, color: string, icon: string) => {
+    if (editingCategory) {
+      updateCategory(editingCategory.id, { name, color, icon });
+    } else {
+      addCategory({ name, color, icon });
     }
   };
 
@@ -94,18 +164,6 @@ export function FilterSidebar() {
         deleteCategory(id);
       }
     }
-  };
-
-  const startEditCategory = (id: string, name: string) => {
-    setEditingCategoryId(id);
-    setCategoryInput(name);
-    setIsAddingCategory(false);
-  };
-
-  const cancelEdit = () => {
-    setEditingCategoryId(null);
-    setIsAddingCategory(false);
-    setCategoryInput("");
   };
 
   const hasActiveFilters =
@@ -161,59 +219,20 @@ export function FilterSidebar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsAddingCategory(true)}
+              onClick={handleOpenAddCategory}
               className="h-6 w-6 p-0"
             >
               <Plus className="h-3.5 w-3.5" />
             </Button>
           </div>
           <div className="space-y-1">
-            {isAddingCategory && (
-              <div className="flex items-center gap-1 mb-2">
-                <input
-                  type="text"
-                  value={categoryInput}
-                  onChange={(e) => setCategoryInput(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleAddCategory()}
-                  placeholder="New category..."
-                  className="flex-1 px-2 py-1 text-sm border rounded-md bg-background"
-                  autoFocus
-                />
-                <Button size="sm" onClick={handleAddCategory} className="h-7 px-2">
-                  Add
-                </Button>
-                <Button size="sm" variant="ghost" onClick={cancelEdit} className="h-7 px-2">
-                  <X className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            )}
             {categories.map((category) => {
               const count = prompts.filter(
                 (p) => p.category === category.name
               ).length;
               const isActive = filters.categories.includes(category.name);
-              const isEditing = editingCategoryId === category.id;
 
-              if (isEditing) {
-                return (
-                  <div key={category.id} className="flex items-center gap-1 mb-2">
-                    <input
-                      type="text"
-                      value={categoryInput}
-                      onChange={(e) => setCategoryInput(e.target.value)}
-                      onKeyPress={(e) => e.key === "Enter" && handleUpdateCategory(category.id)}
-                      className="flex-1 px-2 py-1 text-sm border rounded-md bg-background"
-                      autoFocus
-                    />
-                    <Button size="sm" onClick={() => handleUpdateCategory(category.id)} className="h-7 px-2">
-                      Save
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={cancelEdit} className="h-7 px-2">
-                      <X className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                );
-              }
+              const IconComponent = category.icon ? ICON_MAP[category.icon] || Folder : Folder;
 
               return (
                 <div key={category.id} className="group relative">
@@ -228,9 +247,11 @@ export function FilterSidebar() {
                   >
                     <div className="flex items-center gap-2">
                       <div
-                        className="w-3 h-3 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: category.color }}
-                      />
+                        className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center"
+                        style={{ backgroundColor: category.color || '#3b82f6' }}
+                      >
+                        <IconComponent className="w-3.5 h-3.5 text-white" />
+                      </div>
                       <span className="truncate">{category.name}</span>
                     </div>
                     <span className="text-muted-foreground">{count}</span>
@@ -241,7 +262,7 @@ export function FilterSidebar() {
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
-                        startEditCategory(category.id, category.name);
+                        handleOpenEditCategory(category);
                       }}
                       className="h-6 w-6 p-0 hover:bg-background"
                     >
@@ -320,6 +341,13 @@ export function FilterSidebar() {
           </div>
         )}
       </div>
+
+      <CategoryModal
+        category={editingCategory}
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        onSave={handleSaveCategory}
+      />
     </aside>
   );
 }

@@ -22,9 +22,10 @@ interface HeaderProps {
   onAddPrompt: () => void;
   onImport: () => void;
   onSignInClick: () => void;
+  onBrowseTemplates: () => void;
 }
 
-export function Header({ onAddPrompt, onImport, onSignInClick }: HeaderProps) {
+export function Header({ onAddPrompt, onImport, onSignInClick, onBrowseTemplates }: HeaderProps) {
   const { settings, setViewMode, prompts } = useStore();
   const { theme, setTheme } = useTheme();
   const { user } = useAuth();
@@ -63,7 +64,7 @@ export function Header({ onAddPrompt, onImport, onSignInClick }: HeaderProps) {
   };
 
   // Determine logo based on theme
-  const logoSrc = theme === "dark" ? "/Curata_logomark_white.png" : "/logo.png";
+  const logoSrc = theme === "dark" ? "/Curata_logomark_white.svg" : "/Curata_logomark.svg";
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
@@ -77,6 +78,7 @@ export function Header({ onAddPrompt, onImport, onSignInClick }: HeaderProps) {
               width={120}
               height={120}
               className="h-auto w-20 md:w-32 lg:w-40"
+              priority
             />
             <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">
               Never rewrite the perfect prompt.
@@ -143,6 +145,11 @@ export function Header({ onAddPrompt, onImport, onSignInClick }: HeaderProps) {
             )}
 
             <div className="h-6 w-px bg-border" />
+
+            <Button variant="outline" size="sm" onClick={onBrowseTemplates}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Templates
+            </Button>
 
             <Button variant="outline" size="sm" onClick={onImport}>
               <Upload className="h-4 w-4 mr-2" />
@@ -231,6 +238,18 @@ export function Header({ onAddPrompt, onImport, onSignInClick }: HeaderProps) {
                   </div>
 
                   <div className="h-px bg-border my-2" />
+
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      onBrowseTemplates();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Templates
+                  </Button>
 
                   <Button
                     variant="outline"

@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Eye, FileText } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 import {
   Dialog,
   DialogContent,
@@ -60,6 +64,21 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
   const [tagInput, setTagInput] = useState("");
   const [customAIModel, setCustomAIModel] = useState("");
   const [customModelError, setCustomModelError] = useState("");
+  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
+  const [showMarkdownPreview, setShowMarkdownPreview] = useState(false);
+
+  // Get all unique tags from existing prompts
+  const allExistingTags = Array.from(
+    new Set(prompts.flatMap((p) => p.tags))
+  ).sort();
+
+  // Filter suggestions based on input
+  const tagSuggestions = allExistingTags.filter(
+    (tag) =>
+      tag.toLowerCase().includes(tagInput.toLowerCase()) &&
+      !tags.includes(tag) &&
+      tagInput.length > 0
+  );
 
   // Get all unique custom AI models from existing prompts
   const existingCustomModels = Array.from(
@@ -184,11 +203,12 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
     resetForm();
   };
 
-  const handleAddTag = () => {
-    const tag = tagInput.trim().toLowerCase();
+  const handleAddTag = (tagToAdd?: string) => {
+    const tag = (tagToAdd || tagInput).trim().toLowerCase();
     if (tag && !tags.includes(tag)) {
       setTags([...tags, tag]);
       setTagInput("");
+      setShowTagSuggestions(false);
     }
   };
 
@@ -230,19 +250,69 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
               <label className="text-sm font-medium">
                 Prompt Content <span className="text-destructive">*</span>
               </label>
-              <span className="text-xs text-muted-foreground">
-                {formData.content.trim().split(/\s+/).filter(Boolean).length} words • {formData.content.length} characters
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">
+                  {formData.content.trim().split(/\s+/).filter(Boolean).length} words • {formData.content.length} characters
+                </span>
+                {formData.content && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowMarkdownPreview(!showMarkdownPreview)}
+                    className="h-7 text-xs"
+                  >
+                    {showMarkdownPreview ? (
+                      <>
+                        <FileText className="h-3.5 w-3.5 mr-1.5" />
+                        Edit
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="h-3.5 w-3.5 mr-1.5" />
+                        Preview
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
-            <Textarea
-              value={formData.content}
-              onChange={(e) =>
-                setFormData({ ...formData, content: e.target.value })
-              }
-              placeholder="Enter your prompt here..."
-              className="min-h-[150px]"
-              required
-            />
+            {showMarkdownPreview ? (
+              <div className="min-h-[150px] bg-background border rounded-md p-4 text-sm prose prose-sm dark:prose-invert max-w-none">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                  components={{
+                    a: ({ node, ...props }) => (
+                      <a {...props} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" />
+                    ),
+                    code: ({ node, inline, className, children, ...props }: any) => (
+                      inline ? (
+                        <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                          {children}
+                        </code>
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      )
+                    ),
+                  }}
+                >
+                  {formData.content}
+                </ReactMarkdown>
+              </div>
+            ) : (
+              <Textarea
+                value={formData.content}
+                onChange={(e) =>
+                  setFormData({ ...formData, content: e.target.value })
+                }
+                placeholder="Enter your prompt here..."
+                className="min-h-[150px]"
+                required
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -324,16 +394,34 @@ export function PromptForm({ prompt, isOpen, onClose }: PromptFormProps) {
 
           <div>
             <label className="text-sm font-medium mb-1.5 block">Tags</label>
-            <div className="flex gap-2">
-              <Input
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={handleTagInputKeyDown}
-                placeholder="Add tags (press Enter)"
-              />
-              <Button type="button" onClick={handleAddTag} variant="outline">
-                Add
-              </Button>
+            <div className="relative">
+              <div className="flex gap-2">
+                <Input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleTagInputKeyDown}
+                  onFocus={() => setShowTagSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowTagSuggestions(false), 200)}
+                  placeholder="Add tags (press Enter)"
+                />
+                <Button type="button" onClick={() => handleAddTag()} variant="outline">
+                  Add
+                </Button>
+              </div>
+              {showTagSuggestions && tagSuggestions.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                  {tagSuggestions.map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => handleAddTag(tag)}
+                      className="w-full px-3 py-2 text-left text-sm hover:bg-muted transition-colors"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">

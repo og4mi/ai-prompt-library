@@ -129,6 +129,7 @@ export default function HomePage() {
         onAddPrompt={handleAddPrompt}
         onImport={() => setIsImportOpen(true)}
         onSignInClick={() => setIsAuthModalOpen(true)}
+        onBrowseTemplates={() => setIsTemplatesOpen(true)}
       />
 
       <div className="flex-1 flex overflow-hidden">
